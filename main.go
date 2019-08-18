@@ -120,7 +120,7 @@ func main() {
 		panic("--url, --user and --pass is must be set.")
 	}
 
-	mr, err := mysqlrouter.New("https://mysqlrouter-test.xzy.pw", "luis", "luis")
+	mr, err := mysqlrouter.New(*url, *user, *pass)
 	if err != nil {
 		panic(err)
 	}
