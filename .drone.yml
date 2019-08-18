@@ -5,6 +5,11 @@ platform:
   arch: amd64
 
 steps:
+  - name: fetch
+    image: docker:git
+    commands:
+      - git fetch --tags
+
   - name: lint
     image: golang
     volumes:
@@ -13,6 +18,10 @@ steps:
     commands:
       - go get -u golang.org/x/lint/golint
       - golint
+    when:
+      event:
+        exclude:
+          - tag
 
   - name: release
     image: golang
