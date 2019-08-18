@@ -108,10 +108,17 @@ func init() {
 
 var (
 	port = flag.String("port", "49152", "Listen port for exporter")
+	url  = flag.String("url", "", "URL of MySQL Router REST API")
+	user = flag.String("user", "", "Username for MySQL Router REST API")
+	pass = flag.String("pass", "", "Password for MySQL Router REST API")
 )
 
 func main() {
 	flag.Parse()
+
+	if *url == "" || *user == "" || *pass == "" {
+		panic("--url, --user and --pass is must be set.")
+	}
 
 	mr, err := mysqlrouter.New("https://mysqlrouter-test.xzy.pw", "luis", "luis")
 	if err != nil {

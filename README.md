@@ -16,11 +16,13 @@ After=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/mysqlrouter_exporter
+ExecStart=/usr/local/bin/mysqlrouter_exporter --url mysqlrouter.luis.local --user luis --pass luis
 
 [Install]
 WantedBy=multi-user.target
 ```
+
+You must set `--url`, `--user` and `--pass`.
 
 Default listen port is `49152`.  
 If want to change it, use `--port` flag.
