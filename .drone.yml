@@ -1,0 +1,12 @@
+kind: pipeline
+name: default
+
+platform:
+  arch: amd64
+
+steps:
+  - name: lint
+    image: golang
+    commands:
+      - go get -u golang.org/x/lint/golint
+      - golint
