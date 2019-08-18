@@ -4,7 +4,7 @@ mysqlrouter-exporter
 
 Usage
 -----
-1. Download binary from [release]().
+1. Download binary from [release](https://github.com/rluisr/mysqlrouter_exporter/releases).
 2. Move to /usr/local/bin/
 3. Add systemd script.
 4. Start
