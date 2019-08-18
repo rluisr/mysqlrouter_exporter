@@ -16,7 +16,7 @@ After=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/mysqlrouter_exporter --url mysqlrouter.luis.local --user luis --pass luis
+ExecStart=/usr/local/bin/mysqlrouter_exporter --url http://mysqlrouter.luis.local --user luis --pass luis
 
 [Install]
 WantedBy=multi-user.target
