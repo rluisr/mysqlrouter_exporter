@@ -85,42 +85,32 @@ var (
 		prometheus.GaugeOpts{
 			Name: "route_connections_byte_from_server",
 			Help: "Route connections byte from server",
-		}, []string{"name"})
+		}, []string{"name", "source_address", "destination_address"})
 	routeConnectionsByteToServerGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "route_connections_byte_to_server",
 			Help: "Route connections byte to server",
-		}, []string{"name"})
-	routeConnectionsSourceAddressGauge = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "route_connections_source_address",
-			Help: "Route connections source address",
-		}, []string{"name", "source_address"})
-	routeConnectionsDestinationAddressGauge = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "route_connections_destination_address",
-			Help: "Route connections destination address",
-		}, []string{"name", "destination_address"})
+		}, []string{"name", "source_address", "destination_address"})
 	routeConnectionsTimeStartedGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "route_connections_time_started",
 			Help: "Route connections time started",
-		}, []string{"name", "time_started"})
+		}, []string{"name", "source_address", "destination_address"})
 	routeConnectionsTimeConnectedToServerGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "route_connections_time_connected_to_server",
 			Help: "Route connections time connected to server",
-		}, []string{"name", "time_connected_to_server"})
+		}, []string{"name", "source_address", "destination_address"})
 	routeConnectionsTimeLastSentToServerGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "route_connections_time_last_sent_to_server",
 			Help: "Route connections time last sent to server",
-		}, []string{"name", "time_last_sent_to_server"})
+		}, []string{"name", "source_address", "destination_address"})
 	routeConnectionsTimeLastReceivedFromServerGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "route_connections_time_last_received_from_server",
 			Help: "Route connections time last received from server",
-		}, []string{"name", "time_last_received_from_server"})
+		}, []string{"name", "source_address", "destination_address"})
 )
 
 func init() {
@@ -138,8 +128,6 @@ func init() {
 		routeDestinationsGauge,
 		routeConnectionsByteFromServerGauge,
 		routeConnectionsByteToServerGauge,
-		routeConnectionsSourceAddressGauge,
-		routeConnectionsDestinationAddressGauge,
 		routeConnectionsTimeStartedGauge,
 		routeConnectionsTimeConnectedToServerGauge,
 		routeConnectionsTimeLastSentToServerGauge,
@@ -241,25 +229,13 @@ func main() {
 				if err != nil {
 					panic(err)
 				}
-				if len(rc) == 0 {
-					routeConnectionsByteFromServerGauge.WithLabelValues(route.Name).Set(0)
-					routeConnectionsByteToServerGauge.WithLabelValues(route.Name).Set(0)
-					routeConnectionsSourceAddressGauge.WithLabelValues(route.Name, "")
-					routeConnectionsDestinationAddressGauge.WithLabelValues(route.Name, "")
-					routeConnectionsTimeStartedGauge.WithLabelValues(route.Name, "")
-					routeConnectionsTimeConnectedToServerGauge.WithLabelValues(route.Name, "")
-					routeConnectionsTimeLastSentToServerGauge.WithLabelValues(route.Name, "")
-					routeConnectionsTimeLastReceivedFromServerGauge.WithLabelValues(route.Name, "")
-				}
 				for _, c := range rc {
-					routeConnectionsByteFromServerGauge.WithLabelValues(route.Name).Set(float64(c.BytesFromServer))
-					routeConnectionsByteToServerGauge.WithLabelValues(route.Name).Set(float64(c.BytesToServer))
-					routeConnectionsSourceAddressGauge.WithLabelValues(route.Name, c.SourceAddress)
-					routeConnectionsDestinationAddressGauge.WithLabelValues(route.Name, c.DestinationAddress)
-					routeConnectionsTimeStartedGauge.WithLabelValues(route.Name, c.TimeStarted.String())
-					routeConnectionsTimeConnectedToServerGauge.WithLabelValues(route.Name, c.TimeConnectedToServer.String())
-					routeConnectionsTimeLastSentToServerGauge.WithLabelValues(route.Name, c.TimeLastSentToServer.String())
-					routeConnectionsTimeLastReceivedFromServerGauge.WithLabelValues(route.Name, c.TimeLastReceivedFromServer.String())
+					routeConnectionsByteFromServerGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.BytesFromServer))
+					routeConnectionsByteToServerGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.BytesToServer))
+					routeConnectionsTimeStartedGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeStarted.Unix() * 1000))
+					routeConnectionsTimeConnectedToServerGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeConnectedToServer.Unix() * 1000))
+					routeConnectionsTimeLastSentToServerGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeLastSentToServer.Unix() * 1000))
+					routeConnectionsTimeLastReceivedFromServerGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeLastReceivedFromServer.Unix() * 1000))
 				}
 			}
 			time.Sleep(60 * time.Second)
