@@ -39,4 +39,6 @@ scrape_configs:
 
 Grafana Dashboard
 ------------------------
-WIP
+![Grafana Dashboard](https://grafana.com/api/dashboards/10741/images/6782/image "Grafana Dashboard")
+
+available [here](https://grafana.com/grafana/dashboards/10741).
