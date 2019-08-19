@@ -1,4 +1,4 @@
-mysqlrouter-exporter
+mysqlrouter_exporter
 =====================
 [![Build Status](https://cloud.drone.io/api/badges/rluisr/mysqlrouter_exporter/status.svg)](https://cloud.drone.io/rluisr/mysqlrouter_exporter)
 
