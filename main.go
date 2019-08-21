@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -136,20 +137,21 @@ func init() {
 }
 
 var (
-	port = flag.String("port", "49152", "Listen port for exporter")
-	url  = flag.String("url", "", "URL of MySQL Router REST API")
-	user = flag.String("user", "", "Username for MySQL Router REST API")
-	pass = flag.String("pass", "", "Password for MySQL Router REST API")
+	port = os.Getenv("MYSQLROUTER_EXPORTER_PORT")
+	url  = os.Getenv("MYSQLROUTER_EXPORTER_URL")
+	user = os.Getenv("MYSQLROUTER_EXPORTER_USER")
+	pass = os.Getenv("MYSQLROUTER_EXPORTER_PASS")
 )
 
 func main() {
 	flag.Parse()
 
-	if *url == "" || *user == "" || *pass == "" {
-		panic("--url, --user and --pass is must be set.")
+	if url == "" || user == "" || pass == "" {
+		panic("The environment missing.\n" +
+			"MYSQLROUTER_EXPORTER_URL, MYSQLROUTER_EXPORTER_USER and MYSQLROUTER_EXPORTER_PASS is required.")
 	}
 
-	mr, err := mysqlrouter.New(*url, *user, *pass)
+	mr, err := mysqlrouter.New(url, user, pass)
 	if err != nil {
 		panic(err)
 	}
@@ -242,7 +244,11 @@ func main() {
 		}
 	}()
 
-	log.Printf("listen: %s\n", "0.0.0.0:"+*port)
+	if port == "" {
+		port = "49152"
+	}
+
+	log.Printf("listen: %s\n", "0.0.0.0:"+port)
 	http.Handle("/metrics", promhttp.Handler())
-	log.Fatal(http.ListenAndServe("0.0.0.0:"+*port, nil))
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, nil))
 }

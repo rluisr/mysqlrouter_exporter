@@ -16,16 +16,23 @@ After=network-online.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/mysqlrouter_exporter --url http://mysqlrouter.luis.local --user luis --pass luis
+Environment="MYSQLROUTER_EXPORTER_URL=https://mysqlrouter-test.xzy.pw"
+Environment="MYSQLROUTER_EXPORTER_USER=luis"
+Environment="MYSQLROUTER_EXPORTER_PASS=luis"
+ExecStart=/usr/local/bin/mysqlrouter_exporter
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-You must set `--url`, `--user` and `--pass`.
+You must set these environment variables:  
+- `MYSQLROUTER_EXPORTER_URL:` MySQL Router REST API URL.
+- `MYSQLROUTER_EXPORTER_USER:` Username for REST API
+- `MYSQLROUTER_EXPORTER_PASS:` Password for REST API
 
-Default listen port is `49152`.  
-If want to change it, use `--port` flag.
+
+Default exporter listen port is `49152`.  
+If you want change it use `MYSQLROUTER_EXPORTER_PORT`.
 
 Prometheus configuration
 -------------------------
