@@ -39,7 +39,7 @@ var (
 			Namespace: nameSpace,
 			Name:      "metadata_config_node",
 			Help:      "metadata config node",
-		}, []string{"name", "cluster_name", "hostname", "port"})
+		}, []string{"name", "router_host", "cluster_name", "hostname", "port"})
 	metadataStatusGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: nameSpace,
@@ -57,25 +57,25 @@ var (
 			Namespace: nameSpace,
 			Name:      "route_active_connections",
 			Help:      "route active connections",
-		}, []string{"name"})
+		}, []string{"name", "router_hostname"})
 	routeTotalConnectionsGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: nameSpace,
 			Name:      "route_total_connections",
 			Help:      "route total connections",
-		}, []string{"name"})
+		}, []string{"name", "router_hostname"})
 	routeBlockedHostsGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: nameSpace,
 			Name:      "route_blocked_hosts",
 			Help:      "route blocked_hosts",
-		}, []string{"name"})
+		}, []string{"name", "router_hostname"})
 	routeHealthGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: nameSpace,
 			Name:      "route_health",
 			Help:      "0: not active, 1: active",
-		}, []string{"name"})
+		}, []string{"name", "router_hostname"})
 	routeDestinationsGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: nameSpace,
@@ -86,32 +86,32 @@ var (
 		prometheus.GaugeOpts{
 			Name: "route_connections_byte_from_server",
 			Help: "Route connections byte from server",
-		}, []string{"name", "source_address", "destination_address"})
+		}, []string{"name", "router_hostname", "source_address", "destination_address"})
 	routeConnectionsByteToServerGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "route_connections_byte_to_server",
 			Help: "Route connections byte to server",
-		}, []string{"name", "source_address", "destination_address"})
+		}, []string{"name", "router_hostname", "source_address", "destination_address"})
 	routeConnectionsTimeStartedGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "route_connections_time_started",
 			Help: "Route connections time started",
-		}, []string{"name", "source_address", "destination_address"})
+		}, []string{"name", "router_hostname", "source_address", "destination_address"})
 	routeConnectionsTimeConnectedToServerGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "route_connections_time_connected_to_server",
 			Help: "Route connections time connected to server",
-		}, []string{"name", "source_address", "destination_address"})
+		}, []string{"name", "router_hostname", "source_address", "destination_address"})
 	routeConnectionsTimeLastSentToServerGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "route_connections_time_last_sent_to_server",
 			Help: "Route connections time last sent to server",
-		}, []string{"name", "source_address", "destination_address"})
+		}, []string{"name", "router_hostname", "source_address", "destination_address"})
 	routeConnectionsTimeLastReceivedFromServerGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "route_connections_time_last_received_from_server",
 			Help: "Route connections time last received from server",
-		}, []string{"name", "source_address", "destination_address"})
+		}, []string{"name", "router_hostname", "source_address", "destination_address"})
 )
 
 func init() {
@@ -182,7 +182,7 @@ func main() {
 
 				// config node
 				for _, node := range mc.Nodes {
-					metadataConfigNodeGauge.WithLabelValues(m.Name, mc.ClusterName, node.Hostname, strconv.Itoa(node.Port))
+					metadataConfigNodeGauge.WithLabelValues(m.Name, router.Hostname, mc.ClusterName, node.Hostname, strconv.Itoa(node.Port))
 				}
 
 				// status
@@ -205,16 +205,16 @@ func main() {
 				if err != nil {
 					panic(err)
 				}
-				routeActiveConnectionsGauge.WithLabelValues(route.Name).Set(float64(rs.ActiveConnections))
-				routeTotalConnectionsGauge.WithLabelValues(route.Name).Set(float64(rs.TotalConnections))
-				routeBlockedHostsGauge.WithLabelValues(route.Name).Set(float64(rs.BlockedHosts))
+				routeActiveConnectionsGauge.WithLabelValues(route.Name, router.Hostname).Set(float64(rs.ActiveConnections))
+				routeTotalConnectionsGauge.WithLabelValues(route.Name, router.Hostname).Set(float64(rs.TotalConnections))
+				routeBlockedHostsGauge.WithLabelValues(route.Name, router.Hostname).Set(float64(rs.BlockedHosts))
 
 				rh, err := mr.GetRouteHealth(route.Name)
 				if err != nil {
 					panic(err)
 				}
 				if rh.IsAlive {
-					routeHealthGauge.WithLabelValues(route.Name).Set(float64(1))
+					routeHealthGauge.WithLabelValues(route.Name, router.Hostname).Set(float64(1))
 				} else {
 					routeHealthGauge.WithLabelValues(route.Name).Set(float64(0))
 				}
@@ -232,12 +232,12 @@ func main() {
 					panic(err)
 				}
 				for _, c := range rc {
-					routeConnectionsByteFromServerGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.BytesFromServer))
-					routeConnectionsByteToServerGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.BytesToServer))
-					routeConnectionsTimeStartedGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeStarted.Unix() * 1000))
-					routeConnectionsTimeConnectedToServerGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeConnectedToServer.Unix() * 1000))
-					routeConnectionsTimeLastSentToServerGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeLastSentToServer.Unix() * 1000))
-					routeConnectionsTimeLastReceivedFromServerGauge.WithLabelValues(route.Name, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeLastReceivedFromServer.Unix() * 1000))
+					routeConnectionsByteFromServerGauge.WithLabelValues(route.Name, router.Hostname, c.SourceAddress, c.DestinationAddress).Set(float64(c.BytesFromServer))
+					routeConnectionsByteToServerGauge.WithLabelValues(route.Name, router.Hostname, c.SourceAddress, c.DestinationAddress).Set(float64(c.BytesToServer))
+					routeConnectionsTimeStartedGauge.WithLabelValues(route.Name, router.Hostname, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeStarted.Unix() * 1000))
+					routeConnectionsTimeConnectedToServerGauge.WithLabelValues(route.Name, router.Hostname, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeConnectedToServer.Unix() * 1000))
+					routeConnectionsTimeLastSentToServerGauge.WithLabelValues(route.Name, router.Hostname, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeLastSentToServer.Unix() * 1000))
+					routeConnectionsTimeLastReceivedFromServerGauge.WithLabelValues(route.Name, router.Hostname, c.SourceAddress, c.DestinationAddress).Set(float64(c.TimeLastReceivedFromServer.Unix() * 1000))
 				}
 			}
 			time.Sleep(60 * time.Second)
