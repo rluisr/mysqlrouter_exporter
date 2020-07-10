@@ -2,12 +2,17 @@ mysqlrouter_exporter
 =====================
 [![Build Status](https://cloud.drone.io/api/badges/rluisr/mysqlrouter_exporter/status.svg)](https://cloud.drone.io/rluisr/mysqlrouter_exporter)
 
+Supported MySQL Router version
+-------------------------------
+8.0.16 - 8.0.20
+
 Usage
 -----
-1. Download binary from [release](https://github.com/rluisr/mysqlrouter_exporter/releases).
-2. Move to /usr/local/bin/
-3. Add systemd script.
-4. Start
+1. Enable REST API on your MySQL Router [here](https://lefred.be/content/mysqlrouter-8-0-17-and-the-rest-api/)
+2. Download binary from [release](https://github.com/rluisr/mysqlrouter_exporter/releases).
+3. Move to /usr/local/bin/
+4. Add systemd script.
+5. Start
 ```
 [Unit]
 Description=mysqlrouter-exporter
@@ -31,8 +36,7 @@ You must set these environment variables:
 - `MYSQLROUTER_EXPORTER_PASS:` Password for REST API
 
 
-Default exporter listen port is `49152`.  
-If you want change it use `MYSQLROUTER_EXPORTER_PORT`.
+Default exporter listen port is `49152`. If you want change it, use flag `--port`.
 
 Prometheus configuration
 -------------------------

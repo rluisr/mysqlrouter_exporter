@@ -1,6 +1,6 @@
 module github.com/rluisr/mysqlrouter_exporter
 
-go 1.12
+go 1.14
 
 require (
 	github.com/koron/go-dproxy v1.2.1
