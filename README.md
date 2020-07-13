@@ -4,11 +4,11 @@ mysqlrouter_exporter
 
 Supported MySQL Router version
 -------------------------------
-8.0.16 - 8.0.20
+check [here](https://github.com/rluisr/mysqlrouter-go#supported-version)
 
 Usage
 -----
-1. Enable REST API on your MySQL Router [here](https://lefred.be/content/mysqlrouter-8-0-17-and-the-rest-api/)
+1. Enable REST API on your MySQL Router [here](https://github.com/rluisr/mysqlrouter-go#supported-version)
 2. Download binary from [release](https://github.com/rluisr/mysqlrouter_exporter/releases).
 3. Move to /usr/local/bin/
 4. Add systemd script.
