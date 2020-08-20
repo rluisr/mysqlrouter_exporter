@@ -35,8 +35,12 @@ You must set these environment variables:
 - `MYSQLROUTER_EXPORTER_USER:` Username for REST API
 - `MYSQLROUTER_EXPORTER_PASS:` Password for REST API
 
-
-Default exporter listen port is `49152`. If you want change it, use flag `--port`.
+```
+$ ./mysqlrouter_exporter -h
+  --port                  Listen port. Default 49152
+  --version               Show version
+  --skip-tls-verify       Skip TLS Verification
+```
 
 Prometheus configuration
 -------------------------
