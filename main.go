@@ -26,13 +26,13 @@ const (
 	collectInterval = 2 * time.Second
 )
 
-func initialClient() (*mysqlrouter.Client, error) {
-	if url == "" || user == "" || pass == "" {
+func initialClient(skipTLSVerify bool) (*mysqlrouter.Client, error) {
+	if url == "" {
 		panic("These environments are missing.\n" +
-			"MYSQLROUTER_EXPORTER_URL, MYSQLROUTER_EXPORTER_USER and MYSQLROUTER_EXPORTER_PASS is required.")
+			"MYSQLROUTER_EXPORTER_URL is required and MYSQLROUTER_EXPORTER_USER and MYSQLROUTER_EXPORTER_PASS are optional.")
 	}
 
-	return mysqlrouter.New(url, user, pass)
+	return mysqlrouter.New(url, user, pass, skipTLSVerify)
 }
 
 func recordMetrics() {
@@ -144,8 +144,9 @@ func writeError(err error) {
 }
 
 func flagUsage() {
-	usageText := `--port        Listen port. Default 49152
---version     Show version`
+	usageText := `--port        		Listen port. Default 49152
+--version     		Show version
+--skip-tls-verify	Skip TLS Verification`
 
 	_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", usageText)
 }
@@ -153,6 +154,7 @@ func flagUsage() {
 func main() {
 	listenPortFlag := flag.Int("port", 49152, "listen port")
 	versionFlag := flag.Bool("version", false, "show version --version")
+	skipTLSVerify := flag.Bool("skip-tls-verify", false, "Skip TLS Verification")
 
 	flag.Usage = flagUsage
 	flag.Parse()
@@ -163,7 +165,7 @@ func main() {
 	}
 
 	var err error
-	mysqlRouterClient, err = initialClient()
+	mysqlRouterClient, err = initialClient(*skipTLSVerify)
 	if err != nil {
 		log.Fatalf("failed to create mysql router client. err: %s\n", err.Error())
 	}
