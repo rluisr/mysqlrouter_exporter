@@ -18,7 +18,10 @@ var (
 	url               = os.Getenv("MYSQLROUTER_EXPORTER_URL")
 	user              = os.Getenv("MYSQLROUTER_EXPORTER_USER")
 	pass              = os.Getenv("MYSQLROUTER_EXPORTER_PASS")
-	version           string
+
+	version string
+	commit  string
+	date    string
 )
 
 const (
@@ -160,7 +163,7 @@ func main() {
 	flag.Parse()
 
 	if *versionFlag {
-		fmt.Printf("version: %s\n", version)
+		fmt.Printf("version: %s commit: %s date: %s\n", version, commit, date)
 		os.Exit(0)
 	}
 
