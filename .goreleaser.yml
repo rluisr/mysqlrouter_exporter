@@ -14,6 +14,18 @@ builds:
       - -X main.date={{.Date}}
     env:
       - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+      - 386
+    goarm:
+      - 6
+      - 7
     ignore:
       - goos: darwin
         goarch: 386
