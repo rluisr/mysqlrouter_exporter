@@ -21,19 +21,31 @@ After=network-online.target
 
 [Service]
 Type=simple
-Environment="MYSQLROUTER_EXPORTER_URL=https://mysqlrouter-test.xzy.pw"
-Environment="MYSQLROUTER_EXPORTER_USER=luis"
-Environment="MYSQLROUTER_EXPORTER_PASS=luis"
+Environment="MYSQLROUTER_EXPORTER_URL=url"
+Environment="MYSQLROUTER_EXPORTER_USER=user"
+Environment="MYSQLROUTER_EXPORTER_PASS=pass"
 ExecStart=/usr/local/bin/mysqlrouter_exporter
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-You must set these environment variables:  
-- `MYSQLROUTER_EXPORTER_URL:` MySQL Router REST API URL.
-- `MYSQLROUTER_EXPORTER_USER:` Username for REST API
-- `MYSQLROUTER_EXPORTER_PASS:` Password for REST API
+Environment
+-----------
+
+Edit systemd script or add an environment variables.
+
+Name | Default | Require | Description
+---- | ------- | ------- | ----------
+MYSQLROUTER_EXPORTER_URL    | - | yes   | MySQL Router Rest API URL
+MYSQLROUTER_EXPORTER_USER   | - | no    | Username for REST API
+MYSQLROUTER_EXPORTER_PASS   | - | no    | Password for REST API
+
+Collector Flags
+----------------
+
+Name                                                         | MySQL Version | Description
+-------------------------------------------------------------|---------------|------------------------------------------------------------------------------------
 
 ```
 $ ./mysqlrouter_exporter -h
