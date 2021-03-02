@@ -35,23 +35,52 @@ Environment
 
 Edit systemd script or add an environment variables.
 
-Name | Default | Require | Description
----- | ------- | ------- | ----------
-MYSQLROUTER_EXPORTER_URL    | - | yes   | MySQL Router Rest API URL
-MYSQLROUTER_EXPORTER_USER   | - | no    | Username for REST API
-MYSQLROUTER_EXPORTER_PASS   | - | no    | Password for REST API
+Name                        | Default | Require | Description
+----------------------------|---------| --------| ----------
+MYSQLROUTER_EXPORTER_URL    | -       | yes     | MySQL Router Rest API URL
+MYSQLROUTER_EXPORTER_USER   | -       | no      | Username for REST API
+MYSQLROUTER_EXPORTER_PASS   | -       | no      | Password for REST API
+
+You can also set it as a flag.
 
 Collector Flags
 ----------------
 
-Name                                                         | MySQL Version | Description
--------------------------------------------------------------|---------------|------------------------------------------------------------------------------------
+Name                                                        | Default   | Description
+------------------------------------------------------------|-----------|-------------
+skip.collect.route.connections.byte_from_server             | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
+skip.collect.route.connections.byte_to_server               | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
+skip.collect.route.connections.time_started                 | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
+skip.collect.route.connections.time_connected_to_server     | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
+skip.collect.route.connections.time_last_sent_to_server     | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
+skip.collect.route.connections.time_received_from_server    | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
 
 ```
-$ ./mysqlrouter_exporter -h
-  --port                  Listen port. Default 49152
-  --version               Show version
-  --skip-tls-verify       Skip TLS Verification
+Usage:
+  mysqlrouter_exporter [OPTIONS]
+
+Application Options:
+      --url=                                                      MySQL Router Rest API URL [$MYSQLROUTER_EXPORTER_URL]
+      --user=                                                     Username for REST API [$MYSQLROUTER_EXPORTER_USER]
+      --pass=                                                     Password for REST API [$MYSQLROUTER_EXPORTER_PASS]
+  -p, --listen-port=                                              Listen port (default: 49152)
+  -k, --skip-tls-verify                                           Skip TLS Verification
+      --skip.collect.route.connections.byte_from_server           Skip Collect metrics from route connections. Set the flag if you getting high CPU
+                                                                  usage.
+      --skip.collect.route.connections.byte_to_server             Skip Collect metrics from route connections. Set the flag if you getting high CPU
+                                                                  usage.
+      --skip.collect.route.connections.time_started               Skip Collect metrics from route connections. Set the flag if you getting high CPU
+                                                                  usage.
+      --skip.collect.route.connections.time_connected_to_server   Skip Collect metrics from route connections. Set the flag if you getting high CPU
+                                                                  usage.
+      --skip.collect.route.connections.time_last_sent_to_server   Skip Collect metrics from route connections. Set the flag if you getting high CPU
+                                                                  usage.
+      --skip.collect.route.connections.time_received_from_server  Skip Collect metrics from route connections. Set the flag if you getting high CPU
+                                                                  usage.
+  -v, --version                                                   Show version
+
+Help Options:
+  -h, --help                                                      Show this help message
 ```
 
 Prometheus configuration
