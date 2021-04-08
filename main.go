@@ -28,12 +28,13 @@ var args struct {
 	ListenPort    int    `short:"p" long:"listen-port" default:"49152" description:"Listen port"`
 	SkipTLSVerify bool   `short:"k" long:"skip-tls-verify" description:"Skip TLS Verification"`
 
-	SkipCollectRouteConnectionsByteFromServer         bool `short:"" long:"skip.collect.route.connections.byte_from_server" description:"Skip Collect metrics from route connections. Set the flag if you getting high CPU usage."`
-	SkipCollectRouteConnectionsByteToServer           bool `short:"" long:"skip.collect.route.connections.byte_to_server" description:"Skip Collect metrics from route connections. Set the flag if you getting high CPU usage."`
-	SkipCollectRouteConnectionsTimeStarted            bool `short:"" long:"skip.collect.route.connections.time_started" description:"Skip Collect metrics from route connections. Set the flag if you getting high CPU usage."`
-	SkipCollectRouteConnectionsTimeConnectedToServer  bool `short:"" long:"skip.collect.route.connections.time_connected_to_server" description:"Skip Collect metrics from route connections. Set the flag if you getting high CPU usage."`
-	SkipCollectRouteConnectionsTimeLastSentToServer   bool `short:"" long:"skip.collect.route.connections.time_last_sent_to_server" description:"Skip Collect metrics from route connections. Set the flag if you getting high CPU usage."`
-	SkipCollectRouteConnectionsTimeReceivedFromServer bool `short:"" long:"skip.collect.route.connections.time_received_from_server" description:"Skip Collect metrics from route connections. Set the flag if you getting high CPU usage."`
+	CollectMetadataStatus                         bool `short:"" long:"collect.metadata.status" description:"Collect metrics from metadata status. CPU usage will increase."`
+	CollectRouteConnectionsByteFromServer         bool `short:"" long:"collect.route.connections.byte_from_server" description:"Collect metrics from route connections. CPU usage will increase."`
+	CollectRouteConnectionsByteToServer           bool `short:"" long:"collect.route.connections.byte_to_server" description:"Collect metrics from route connections. CPU usage will increase."`
+	CollectRouteConnectionsTimeStarted            bool `short:"" long:"collect.route.connections.time_started" description:"Collect metrics from route connections. CPU usage will increase."`
+	CollectRouteConnectionsTimeConnectedToServer  bool `short:"" long:"collect.route.connections.time_connected_to_server" description:"Collect metrics from route connections. CPU usage will increase."`
+	CollectRouteConnectionsTimeLastSentToServer   bool `short:"" long:"collect.route.connections.time_last_sent_to_server" description:"Collect metrics from route connections. CPU usage will increase."`
+	CollectRouteConnectionsTimeReceivedFromServer bool `short:"" long:"collect.route.connections.time_received_from_server" description:"Collect metrics from route connections. CPU usage will increase."`
 
 	Version bool `short:"v" long:"version" description:"Show version"`
 }
@@ -93,12 +94,14 @@ func collectMetrics() {
 		}
 
 		// status
-		metadataStatus, gmsErr := mysqlRouterClient.GetMetadataStatus(metadata.Name)
-		if gmsErr != nil {
-			writeError(gmsErr)
-			return
+		if args.CollectMetadataStatus {
+			metadataStatus, gmsErr := mysqlRouterClient.GetMetadataStatus(metadata.Name)
+			if gmsErr != nil {
+				writeError(gmsErr)
+				return
+			}
+			metadataStatusGauge.WithLabelValues(metadata.Name, strconv.Itoa(metadataStatus.RefreshFailed), metadataStatus.TimeLastRefreshSucceeded.String(), metadataStatus.LastRefreshHostname, strconv.Itoa(metadataStatus.LastRefreshPort))
 		}
-		metadataStatusGauge.WithLabelValues(metadata.Name, strconv.Itoa(metadataStatus.RefreshFailed), metadataStatus.TimeLastRefreshSucceeded.String(), metadataStatus.LastRefreshHostname, strconv.Itoa(metadataStatus.LastRefreshPort))
 	}
 
 	// routes
@@ -146,22 +149,22 @@ func collectMetrics() {
 			return
 		}
 		for _, routeConnection := range routeConnections {
-			if !args.SkipCollectRouteConnectionsByteFromServer {
+			if args.CollectRouteConnectionsByteFromServer {
 				routeConnectionsByteFromServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(float64(routeConnection.BytesFromServer))
 			}
-			if !args.SkipCollectRouteConnectionsByteToServer {
+			if args.CollectRouteConnectionsByteToServer {
 				routeConnectionsByteToServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(float64(routeConnection.BytesToServer))
 			}
-			if !args.SkipCollectRouteConnectionsTimeStarted {
+			if args.CollectRouteConnectionsTimeStarted {
 				routeConnectionsTimeStartedGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(float64(routeConnection.TimeStarted.Unix() * 1000)) // nolint
 			}
-			if !args.SkipCollectRouteConnectionsTimeConnectedToServer {
+			if args.CollectRouteConnectionsTimeConnectedToServer {
 				routeConnectionsTimeConnectedToServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(float64(routeConnection.TimeConnectedToServer.Unix() * 1000)) //nolint
 			}
-			if !args.SkipCollectRouteConnectionsTimeLastSentToServer {
+			if args.CollectRouteConnectionsTimeLastSentToServer {
 				routeConnectionsTimeLastSentToServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(float64(routeConnection.TimeLastSentToServer.Unix() * 1000)) // nolint
 			}
-			if !args.SkipCollectRouteConnectionsTimeReceivedFromServer {
+			if args.CollectRouteConnectionsTimeReceivedFromServer {
 				routeConnectionsTimeLastReceivedFromServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(float64(routeConnection.TimeLastReceivedFromServer.Unix() * 1000)) // nolint
 			}
 		}
@@ -175,7 +178,7 @@ func writeError(err error) {
 func main() {
 	_, err := flags.Parse(&args)
 	if err != nil {
-		os.Exit(1)
+		log.Fatalln(err)
 	}
 	if args.Version {
 		fmt.Printf("version: %s commit: %s date: %s\n", version, commit, date)
