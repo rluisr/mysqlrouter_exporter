@@ -46,41 +46,39 @@ You can also set it as a flag.
 Collector Flags
 ----------------
 
-Name                                                        | Default   | Description
-------------------------------------------------------------|-----------|-------------
-skip.collect.route.connections.byte_from_server             | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
-skip.collect.route.connections.byte_to_server               | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
-skip.collect.route.connections.time_started                 | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
-skip.collect.route.connections.time_connected_to_server     | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
-skip.collect.route.connections.time_last_sent_to_server     | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
-skip.collect.route.connections.time_received_from_server    | false     | Skip Collect metrics from route connections. Set the flag if you getting high CPU usage.
+mysqlrouter_exporter can all get metrics. [MySQL Router REST API Reference](https://dev.mysql.com/doc/mysql-router/8.0/en/mysql-router-rest-api-reference.html)
+
+Name                                                   | Default   | Description
+-------------------------------------------------------|-----------|-------------
+collect.metadata.status                                | false     | Collect metrics from metadata status. CPU usage will increase.
+collect.route.connections.byte_from_server             | false     | Collect metrics from route connections. CPU usage will increase.
+collect.route.connections.byte_to_server               | false     | Collect metrics from route connections. CPU usage will increase.
+collect.route.connections.time_started                 | false     | Collect metrics from route connections. CPU usage will increase.
+collect.route.connections.time_connected_to_server     | false     | Collect metrics from route connections. CPU usage will increase.
+collect.route.connections.time_last_sent_to_server     | false     | Collect metrics from route connections. CPU usage will increase.
+collect.route.connections.time_received_from_server    | false     | Collect metrics from route connections. CPU usage will increase.
 
 ```
 Usage:
   mysqlrouter_exporter [OPTIONS]
 
 Application Options:
-      --url=                                                      MySQL Router Rest API URL [$MYSQLROUTER_EXPORTER_URL]
-      --user=                                                     Username for REST API [$MYSQLROUTER_EXPORTER_USER]
-      --pass=                                                     Password for REST API [$MYSQLROUTER_EXPORTER_PASS]
-  -p, --listen-port=                                              Listen port (default: 49152)
-  -k, --skip-tls-verify                                           Skip TLS Verification
-      --skip.collect.route.connections.byte_from_server           Skip Collect metrics from route connections. Set the flag if you getting high CPU
-                                                                  usage.
-      --skip.collect.route.connections.byte_to_server             Skip Collect metrics from route connections. Set the flag if you getting high CPU
-                                                                  usage.
-      --skip.collect.route.connections.time_started               Skip Collect metrics from route connections. Set the flag if you getting high CPU
-                                                                  usage.
-      --skip.collect.route.connections.time_connected_to_server   Skip Collect metrics from route connections. Set the flag if you getting high CPU
-                                                                  usage.
-      --skip.collect.route.connections.time_last_sent_to_server   Skip Collect metrics from route connections. Set the flag if you getting high CPU
-                                                                  usage.
-      --skip.collect.route.connections.time_received_from_server  Skip Collect metrics from route connections. Set the flag if you getting high CPU
-                                                                  usage.
-  -v, --version                                                   Show version
+      --url=                                                 MySQL Router Rest API URL [$MYSQLROUTER_EXPORTER_URL]
+      --user=                                                Username for REST API [$MYSQLROUTER_EXPORTER_USER]
+      --pass=                                                Password for REST API [$MYSQLROUTER_EXPORTER_PASS]
+  -p, --listen-port=                                         Listen port (default: 49152)
+  -k, --skip-tls-verify                                      Skip TLS Verification
+      --collect.metadata.status                              Collect metrics from metadata status. CPU usage will increase.
+      --collect.route.connections.byte_from_server           Collect metrics from route connections. CPU usage will increase.
+      --collect.route.connections.byte_to_server             Collect metrics from route connections. CPU usage will increase.
+      --collect.route.connections.time_started               Collect metrics from route connections. CPU usage will increase.
+      --collect.route.connections.time_connected_to_server   Collect metrics from route connections. CPU usage will increase.
+      --collect.route.connections.time_last_sent_to_server   Collect metrics from route connections. CPU usage will increase.
+      --collect.route.connections.time_received_from_server  Collect metrics from route connections. CPU usage will increase.
+  -v, --version                                              Show version
 
 Help Options:
-  -h, --help                                                      Show this help message
+  -h, --help                                                 Show this help message
 ```
 
 Prometheus configuration
