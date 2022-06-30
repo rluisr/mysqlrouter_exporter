@@ -1,10 +1,14 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -15,6 +19,7 @@ import (
 
 var (
 	mysqlRouterClient *mysqlrouter.Client
+	collectInterval   = 2 * time.Second // default collect interval override with --collect-interval
 
 	version string
 	commit  string
@@ -26,8 +31,12 @@ var args struct {
 	RestAPIUser   string `short:"" long:"user" required:"false" env:"MYSQLROUTER_EXPORTER_USER" description:"Username for REST API"`
 	RestAPIPass   string `short:"" long:"pass" required:"false" env:"MYSQLROUTER_EXPORTER_PASS" description:"Password for REST API"`
 	ListenPort    int    `short:"p" long:"listen-port" default:"49152" description:"Listen port"`
+	TLSCACertPath string `short:"" long:"tls-ca-cert-path" required:"false" env:"MYSQLROUTER_TLS_CACERT_PATH" description:"TLS CA cacert path"`
+	TLSCertPath   string `short:"" long:"tls-cert-path" required:"false" env:"MYSQLROUTER_TLS_CERT_PATH" description:"TLS cert path"`
+	TLSKeyPath    string `short:"" long:"tls-key-path" required:"false" env:"MYSQLROUTER_TLS_KEY_PATH" description:"TLS key path"`
 	SkipTLSVerify bool   `short:"k" long:"skip-tls-verify" description:"Skip TLS Verification"`
 
+	CollectInterval                               int  `short:"" long:"collect-interval" required:"false" default:"2" description:"Collect interval time in sec."`
 	CollectMetadataStatus                         bool `short:"" long:"collect.metadata.status" description:"Collect metrics from metadata status. CPU usage will increase."`
 	CollectRouteConnectionsByteFromServer         bool `short:"" long:"collect.route.connections.byte_from_server" description:"Collect metrics from route connections. CPU usage will increase."`
 	CollectRouteConnectionsByteToServer           bool `short:"" long:"collect.route.connections.byte_to_server" description:"Collect metrics from route connections. CPU usage will increase."`
@@ -40,8 +49,7 @@ var args struct {
 }
 
 const (
-	nameSpace       = "mysqlrouter"
-	collectInterval = 2 * time.Second
+	nameSpace = "mysqlrouter"
 )
 
 func initialClient() (*mysqlrouter.Client, error) {
@@ -50,7 +58,64 @@ func initialClient() (*mysqlrouter.Client, error) {
 			"MYSQLROUTER_EXPORTER_URL is required and MYSQLROUTER_EXPORTER_USER and MYSQLROUTER_EXPORTER_PASS are optional.")
 	}
 
-	return mysqlrouter.New(args.RestAPIURL, args.RestAPIUser, args.RestAPIPass, args.SkipTLSVerify)
+	opts, err := initializeClientOptions()
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize client options err: %w", err)
+	}
+
+	return mysqlrouter.New(args.RestAPIURL, args.RestAPIUser, args.RestAPIPass, opts)
+}
+
+func initializeClientOptions() (*mysqlrouter.Options, error) {
+	if args.SkipTLSVerify {
+		return &mysqlrouter.Options{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			},
+		}, nil
+	}
+
+	if args.TLSCACertPath == "" && args.TLSCertPath == "" && args.TLSKeyPath == "" && !args.SkipTLSVerify {
+		return nil, nil
+	}
+
+	certPath, err := filepath.Abs(args.TLSCertPath)
+	if err != nil {
+		return nil, err
+	}
+	keyPath, err := filepath.Abs(args.TLSKeyPath)
+	if err != nil {
+		return nil, err
+	}
+	caPath, err := filepath.Abs(args.TLSCACertPath)
+	if err != nil {
+		return nil, err
+	}
+
+	cert, err := tls.LoadX509KeyPair(certPath, keyPath)
+	if err != nil {
+		return nil, err
+	}
+
+	caCert, err := ioutil.ReadFile(caPath)
+	if err != nil {
+		return nil, err
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      caCertPool,
+	}
+
+	opts := &mysqlrouter.Options{
+		Transport: &http.Transport{
+			TLSClientConfig: tlsConfig,
+		},
+	}
+
+	return opts, nil
 }
 
 func recordMetrics() {
@@ -190,6 +255,7 @@ func main() {
 		log.Fatalf("failed to create mysql router client. err: %s\n", err.Error())
 	}
 
+	collectInterval = time.Duration(args.CollectInterval) * time.Second
 	recordMetrics()
 
 	addr := fmt.Sprintf("0.0.0.0:%d", args.ListenPort)

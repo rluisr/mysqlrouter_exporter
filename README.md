@@ -40,8 +40,35 @@ Name                        | Default | Require | Description
 MYSQLROUTER_EXPORTER_URL    | -       | yes     | MySQL Router Rest API URL
 MYSQLROUTER_EXPORTER_USER   | -       | no      | Username for REST API
 MYSQLROUTER_EXPORTER_PASS   | -       | no      | Password for REST API
+MYSQLROUTER_TLS_CACERT_PATH | -       | no      | TLS CA cert path
+MYSQLROUTER_TLS_CERT_PATH   | -       | no      | TLS cert path
+MYSQLROUTER_TLS_KEY_PATH    | -       | no      | TLS key path
 
-You can also set it as a flag.
+You can also set it as a flag. See below.
+
+```
+Application Options:
+      --url=                                                 MySQL Router Rest API URL [$MYSQLROUTER_EXPORTER_URL]
+      --user=                                                Username for REST API [$MYSQLROUTER_EXPORTER_USER]
+      --pass=                                                Password for REST API [$MYSQLROUTER_EXPORTER_PASS]
+  -p, --listen-port=                                         Listen port (default: 49152)
+      --tls-ca-cert-path=                                    TLS CA cacert path [$MYSQLROUTER_TLS_CACERT_PATH]
+      --tls-cert-path=                                       TLS cert path [$MYSQLROUTER_TLS_CERT_PATH]
+      --tls-key-path=                                        TLS key path [$MYSQLROUTER_TLS_KEY_PATH]
+  -k, --skip-tls-verify                                      Skip TLS Verification
+      --collect-interval=                                    Collect interval time in sec. (default: 2)
+      --collect.metadata.status                              Collect metrics from metadata status. CPU usage will increase.
+      --collect.route.connections.byte_from_server           Collect metrics from route connections. CPU usage will increase.
+      --collect.route.connections.byte_to_server             Collect metrics from route connections. CPU usage will increase.
+      --collect.route.connections.time_started               Collect metrics from route connections. CPU usage will increase.
+      --collect.route.connections.time_connected_to_server   Collect metrics from route connections. CPU usage will increase.
+      --collect.route.connections.time_last_sent_to_server   Collect metrics from route connections. CPU usage will increase.
+      --collect.route.connections.time_received_from_server  Collect metrics from route connections. CPU usage will increase.
+  -v, --version                                              Show version
+
+Help Options:
+  -h, --help                                                 Show this help message
+```
 
 Collector Flags
 ----------------
@@ -57,29 +84,6 @@ collect.route.connections.time_started                 | false     | Collect met
 collect.route.connections.time_connected_to_server     | false     | Collect metrics from route connections. CPU usage will increase.
 collect.route.connections.time_last_sent_to_server     | false     | Collect metrics from route connections. CPU usage will increase.
 collect.route.connections.time_received_from_server    | false     | Collect metrics from route connections. CPU usage will increase.
-
-```
-Usage:
-  mysqlrouter_exporter [OPTIONS]
-
-Application Options:
-      --url=                                                 MySQL Router Rest API URL [$MYSQLROUTER_EXPORTER_URL]
-      --user=                                                Username for REST API [$MYSQLROUTER_EXPORTER_USER]
-      --pass=                                                Password for REST API [$MYSQLROUTER_EXPORTER_PASS]
-  -p, --listen-port=                                         Listen port (default: 49152)
-  -k, --skip-tls-verify                                      Skip TLS Verification
-      --collect.metadata.status                              Collect metrics from metadata status. CPU usage will increase.
-      --collect.route.connections.byte_from_server           Collect metrics from route connections. CPU usage will increase.
-      --collect.route.connections.byte_to_server             Collect metrics from route connections. CPU usage will increase.
-      --collect.route.connections.time_started               Collect metrics from route connections. CPU usage will increase.
-      --collect.route.connections.time_connected_to_server   Collect metrics from route connections. CPU usage will increase.
-      --collect.route.connections.time_last_sent_to_server   Collect metrics from route connections. CPU usage will increase.
-      --collect.route.connections.time_received_from_server  Collect metrics from route connections. CPU usage will increase.
-  -v, --version                                              Show version
-
-Help Options:
-  -h, --help                                                 Show this help message
-```
 
 Prometheus configuration
 -------------------------
