@@ -132,8 +132,10 @@ func collectMetrics() {
 	router, err := mysqlRouterClient.GetRouterStatus()
 	if err != nil {
 		writeError(err)
+		routerUpGauge.Set(float64(0))
 		return
 	}
+	routerUpGauge.Set(float64(1))
 	routerStatusGauge.WithLabelValues(strconv.Itoa(router.ProcessID), router.ProductEdition, router.TimeStarted.String(), router.Version, router.Hostname)
 
 	// metadata
