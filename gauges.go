@@ -6,6 +6,11 @@ import (
 )
 
 var (
+	routerUpGauge = promauto.NewGauge(prometheus.GaugeOpts{
+		Namespace: nameSpace,
+		Name:      "router_up",
+		Help:      "Tells whether MySQL Router is up",
+	})
 	routerStatusGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: nameSpace,
 		Name:      "router_status",
