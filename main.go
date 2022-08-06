@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -97,7 +96,7 @@ func initializeClientOptions() (*mysqlrouter.Options, error) {
 		return nil, err
 	}
 
-	caCert, err := ioutil.ReadFile(caPath)
+	caCert, err := os.ReadFile(caPath)
 	if err != nil {
 		return nil, err
 	}
@@ -155,10 +154,8 @@ func collectMetrics() {
 		}
 		metadataConfigGauge.WithLabelValues(metadata.Name, metadataConfig.ClusterName, strconv.Itoa(metadataConfig.TimeRefreshInMs), metadataConfig.GroupReplicationID)
 
-		// config node
-		for _, metadataConfigNode := range metadataConfig.Nodes {
-			metadataConfigNodeGauge.WithLabelValues(metadata.Name, router.Hostname, metadataConfig.ClusterName, metadataConfigNode.Hostname, strconv.Itoa(metadataConfigNode.Port))
-		}
+		// config nodes count
+		metadataConfigNodesGauge.WithLabelValues(metadata.Name, router.Hostname, metadataConfig.ClusterName, strconv.Itoa(len(metadataConfig.Nodes)))
 
 		// status
 		if args.CollectMetadataStatus {
