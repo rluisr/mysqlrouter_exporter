@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -97,7 +96,7 @@ func initializeClientOptions() (*mysqlrouter.Options, error) {
 		return nil, err
 	}
 
-	caCert, err := ioutil.ReadFile(caPath)
+	caCert, err := os.ReadFile(caPath)
 	if err != nil {
 		return nil, err
 	}
