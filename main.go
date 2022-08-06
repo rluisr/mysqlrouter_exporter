@@ -155,7 +155,7 @@ func collectMetrics() {
 		metadataConfigGauge.WithLabelValues(metadata.Name, metadataConfig.ClusterName, strconv.Itoa(metadataConfig.TimeRefreshInMs), metadataConfig.GroupReplicationID)
 
 		// config nodes count
-		metadataConfigNodesGauge.WithLabelValues(metadata.Name, router.Hostname, metadataConfig.ClusterName, strconv.Itoa(len(metadataConfig.Nodes)))
+		metadataConfigNodesGauge.WithLabelValues(metadata.Name, router.Hostname, metadataConfig.ClusterName).Set(float64(len(metadataConfig.Nodes)))
 
 		// status
 		if args.CollectMetadataStatus {
