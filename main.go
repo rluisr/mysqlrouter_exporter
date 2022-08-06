@@ -155,10 +155,8 @@ func collectMetrics() {
 		}
 		metadataConfigGauge.WithLabelValues(metadata.Name, metadataConfig.ClusterName, strconv.Itoa(metadataConfig.TimeRefreshInMs), metadataConfig.GroupReplicationID)
 
-		// config node
-		for _, metadataConfigNode := range metadataConfig.Nodes {
-			metadataConfigNodeGauge.WithLabelValues(metadata.Name, router.Hostname, metadataConfig.ClusterName, metadataConfigNode.Hostname, strconv.Itoa(metadataConfigNode.Port))
-		}
+		// config nodes count
+		metadataConfigNodesGauge.WithLabelValues(metadata.Name, router.Hostname, metadataConfig.ClusterName, strconv.Itoa(len(metadataConfig.Nodes)))
 
 		// status
 		if args.CollectMetadataStatus {

@@ -26,11 +26,11 @@ var (
 		Name:      "metadata_config",
 		Help:      "metadata config",
 	}, []string{"name", "cluster_name", "time_refresh_in_ms", "group_replication_id"})
-	metadataConfigNodeGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
+	metadataConfigNodesGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: nameSpace,
-		Name:      "metadata_config_node",
-		Help:      "metadata config node",
-	}, []string{"name", "router_host", "cluster_name", "hostname", "port"})
+		Name:      "metadata_config_nodes",
+		Help:      "count of metadata config node",
+	}, []string{"name", "router_host", "cluster_name"})
 	metadataStatusGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: nameSpace,
 		Name:      "metadata_status",
