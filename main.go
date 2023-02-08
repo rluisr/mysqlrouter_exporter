@@ -174,6 +174,26 @@ func collectMetrics() {
 		writeError(err)
 		return
 	}
+	
+	if args.CollectRouteConnectionsByteFromServer {
+		routeConnectionsByteFromServerGauge.Reset()
+	}
+	if args.CollectRouteConnectionsByteToServer {
+		routeConnectionsByteToServerGauge.Reset()
+	}
+	if args.CollectRouteConnectionsTimeStarted {
+		routeConnectionsTimeStartedGauge.Reset()
+	}
+	if args.CollectRouteConnectionsTimeConnectedToServer {
+		routeConnectionsTimeConnectedToServerGauge.Reset()
+	}
+	if args.CollectRouteConnectionsTimeLastSentToServer {
+		routeConnectionsTimeLastSentToServerGauge.Reset()
+	}
+	if args.CollectRouteConnectionsTimeReceivedFromServer {
+		routeConnectionsTimeLastReceivedFromServerGauge.Reset()
+	}
+
 	for _, route := range routes {
 		routeGauge.WithLabelValues(route.Name)
 
