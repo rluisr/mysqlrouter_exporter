@@ -1,6 +1,7 @@
 mysqlrouter_exporter
 =====================
-[![Build Status](https://cloud.drone.io/api/badges/rluisr/mysqlrouter_exporter/status.svg)](https://cloud.drone.io/rluisr/mysqlrouter_exporter)
+[![lint](https://github.com/rluisr/mysqlrouter_exporter/actions/workflows/lint.yml/badge.svg)](https://github.com/rluisr/mysqlrouter_exporter/actions/workflows/lint.yml)
+[![release](https://github.com/rluisr/mysqlrouter_exporter/actions/workflows/release.yml/badge.svg)](https://github.com/rluisr/mysqlrouter_exporter/actions/workflows/release.yml)
 
 Supported MySQL Router version
 -------------------------------
@@ -29,6 +30,15 @@ ExecStart=/usr/local/bin/mysqlrouter_exporter
 [Install]
 WantedBy=multi-user.target
 ```
+
+Container
+----------
+
+```bash
+docker pull ghcr.io/rluisr/mysqlrouter_exporter:latest
+```
+
+[Packages](https://github.com/rluisr/mysqlrouter_exporter/pkgs/container/mysqlrouter_exporter)
 
 Environment
 -----------
