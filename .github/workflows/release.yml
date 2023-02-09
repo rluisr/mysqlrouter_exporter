@@ -43,6 +43,9 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get current date and time
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d %H:%M')"
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v3
@@ -52,6 +55,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           build-args: |
             VERSION=${{github.ref_name}}
+            COMMIT=${{github.sha}}
+            DATE=${{ steps.date.outputs.date }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name != 'pull_request' }}
