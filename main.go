@@ -164,6 +164,7 @@ func collectMetrics() {
 				writeError(gmsErr)
 				return
 			}
+			metadataStatusGauge.Reset()
 			metadataStatusGauge.WithLabelValues(metadata.Name, strconv.Itoa(metadataStatus.RefreshFailed), metadataStatus.TimeLastRefreshSucceeded.String(), metadataStatus.LastRefreshHostname, strconv.Itoa(metadataStatus.LastRefreshPort))
 		}
 	}
