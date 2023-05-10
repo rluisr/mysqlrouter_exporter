@@ -216,7 +216,7 @@ func collectMetrics() {
 		if routeHealth.IsAlive {
 			routeHealthGauge.WithLabelValues(route.Name, router.Hostname).Set(float64(1))
 		} else {
-			routeHealthGauge.WithLabelValues(route.Name).Set(float64(0))
+			routeHealthGauge.WithLabelValues(route.Name, router.Hostname).Set(float64(0))
 		}
 
 		routeDestinations, err := mysqlRouterClient.GetRouteDestinations(route.Name)
