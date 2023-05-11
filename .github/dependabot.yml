@@ -1,10 +1,4 @@
 version: 2
-registries:
-  github-octocat:
-    type: git
-    url: https://github.com
-    username: rluisr
-    password: ${{secrets.MY_GITHUB_PERSONAL_TOKEN}}
 updates:
   - package-ecosystem: "gomod"
     directory: "/"
