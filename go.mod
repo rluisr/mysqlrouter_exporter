@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/prometheus/client_golang v1.15.1
-	github.com/rluisr/mysqlrouter-go v1.1.1
+	github.com/rluisr/mysqlrouter-go v1.2.0
 )
 
 require (
