@@ -47,6 +47,12 @@ var args struct {
 	Version bool `short:"v" long:"version" description:"Show version"`
 }
 
+var (
+	lastRouter           *mysqlrouter.Router
+	lastRoutes           []*mysqlrouter.Routes
+	lastRouteConnections []*mysqlrouter.RouteConnections
+)
+
 const (
 	nameSpace = "mysqlrouter"
 )
@@ -127,55 +133,111 @@ func recordMetrics() {
 }
 
 func collectMetrics() {
-	// router
+	router, err := collectRouterMetrics()
+	if err != nil {
+		writeError(err)
+		router = nil
+	}
+
+	collectMetadataMetrics(router)
+	collectRouteMetrics(router)
+}
+
+func collectRouterMetrics() (*mysqlrouter.Router, error) {
 	router, err := mysqlRouterClient.GetRouterStatus()
 	if err != nil {
-		writeError(err)
-		routerUpGauge.Set(float64(0))
-		return
+		routerUpGauge.Set(0)
+		return nil, err
 	}
-	routerUpGauge.Set(float64(1))
+
+	routerUpGauge.Set(1)
 	routerStatusGauge.WithLabelValues(strconv.Itoa(router.ProcessID), router.ProductEdition, router.TimeStarted.String(), router.Version, router.Hostname)
 
-	// metadata
-	metadatas, err := mysqlRouterClient.GetAllMetadata()
+	lastRouter = router
+
+	return router, nil
+}
+
+func collectMetadataMetrics(router *mysqlrouter.Router) {
+	// nil means router is down
+	// so we don't need to collect metadata metrics
+	if router == nil {
+		return
+	}
+
+	metadata, err := mysqlRouterClient.GetAllMetadata()
 	if err != nil {
 		writeError(err)
 		return
 	}
-	for _, metadata := range metadatas {
-		metadataGauge.WithLabelValues(metadata.Name)
+
+	for _, m := range metadata {
+		metadataGauge.WithLabelValues(m.Name)
 
 		// config
-		metadataConfig, gmcErr := mysqlRouterClient.GetMetadataConfig(metadata.Name)
+		metadataConfig, gmcErr := mysqlRouterClient.GetMetadataConfig(m.Name)
 		if gmcErr != nil {
 			writeError(gmcErr)
 			return
 		}
-		metadataConfigGauge.WithLabelValues(metadata.Name, metadataConfig.ClusterName, strconv.Itoa(metadataConfig.TimeRefreshInMs), metadataConfig.GroupReplicationID)
+		metadataConfigGauge.WithLabelValues(m.Name, metadataConfig.ClusterName, strconv.Itoa(metadataConfig.TimeRefreshInMs), metadataConfig.GroupReplicationID)
 
 		// config nodes count
-		metadataConfigNodesGauge.WithLabelValues(metadata.Name, router.Hostname, metadataConfig.ClusterName).Set(float64(len(metadataConfig.Nodes)))
+		metadataConfigNodesGauge.WithLabelValues(m.Name, router.Hostname, metadataConfig.ClusterName).Set(float64(len(metadataConfig.Nodes)))
 
 		// status
 		if args.CollectMetadataStatus {
-			metadataStatus, gmsErr := mysqlRouterClient.GetMetadataStatus(metadata.Name)
+			metadataStatus, gmsErr := mysqlRouterClient.GetMetadataStatus(m.Name)
 			if gmsErr != nil {
 				writeError(gmsErr)
 				return
 			}
 			metadataStatusGauge.Reset()
-			metadataStatusGauge.WithLabelValues(metadata.Name, strconv.Itoa(metadataStatus.RefreshFailed), metadataStatus.TimeLastRefreshSucceeded.String(), metadataStatus.LastRefreshHostname, strconv.Itoa(metadataStatus.LastRefreshPort))
+			metadataStatusGauge.WithLabelValues(m.Name, strconv.Itoa(metadataStatus.RefreshFailed), metadataStatus.TimeLastRefreshSucceeded.String(), metadataStatus.LastRefreshHostname, strconv.Itoa(metadataStatus.LastRefreshPort))
 		}
 	}
+}
 
-	// routes
+func collectRouteMetrics(router *mysqlrouter.Router) {
+	// nil means router is down
+	// so route metrics will be 0
+	if router == nil {
+		for _, route := range lastRoutes {
+			routeActiveConnectionsGauge.WithLabelValues(route.Name, lastRouter.Hostname).Set(0)
+			routeTotalConnectionsGauge.WithLabelValues(route.Name, lastRouter.Hostname).Set(0)
+			routeBlockedHostsGauge.WithLabelValues(route.Name, lastRouter.Hostname).Set(0)
+			routeHealthGauge.WithLabelValues(route.Name, lastRouter.Hostname).Set(0)
+
+			for _, routeConnection := range lastRouteConnections {
+				if args.CollectRouteConnectionsByteFromServer {
+					routeConnectionsByteFromServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(0)
+				}
+				if args.CollectRouteConnectionsByteToServer {
+					routeConnectionsByteToServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(0)
+				}
+				if args.CollectRouteConnectionsTimeStarted {
+					routeConnectionsTimeStartedGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(0)
+				}
+				if args.CollectRouteConnectionsTimeConnectedToServer {
+					routeConnectionsTimeConnectedToServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(0)
+				}
+				if args.CollectRouteConnectionsTimeLastSentToServer {
+					routeConnectionsTimeLastSentToServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(0)
+				}
+				if args.CollectRouteConnectionsTimeReceivedFromServer {
+					routeConnectionsTimeLastReceivedFromServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(0)
+				}
+			}
+		}
+		return
+	}
+
 	routes, err := mysqlRouterClient.GetAllRoutes()
 	if err != nil {
 		writeError(err)
 		return
 	}
-	
+
 	if args.CollectRouteConnectionsByteFromServer {
 		routeConnectionsByteFromServerGauge.Reset()
 	}
@@ -253,7 +315,9 @@ func collectMetrics() {
 				routeConnectionsTimeLastReceivedFromServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(float64(routeConnection.TimeLastReceivedFromServer.Unix() * 1000)) // nolint
 			}
 		}
+		lastRouteConnections = routeConnections
 	}
+	lastRoutes = routes
 }
 
 func writeError(err error) {
