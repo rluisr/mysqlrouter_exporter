@@ -48,6 +48,7 @@ var args struct {
 }
 
 var (
+	lastRouter           *mysqlrouter.Router
 	lastRoutes           []*mysqlrouter.Routes
 	lastRouteConnections []*mysqlrouter.RouteConnections
 )
@@ -152,6 +153,8 @@ func collectRouterMetrics() (*mysqlrouter.Router, error) {
 	routerUpGauge.Set(1)
 	routerStatusGauge.WithLabelValues(strconv.Itoa(router.ProcessID), router.ProductEdition, router.TimeStarted.String(), router.Version, router.Hostname)
 
+	lastRouter = router
+
 	return router, nil
 }
 
@@ -200,10 +203,10 @@ func collectRouteMetrics(router *mysqlrouter.Router) {
 	// so route metrics will be 0
 	if router == nil {
 		for _, route := range lastRoutes {
-			routeActiveConnectionsGauge.WithLabelValues(route.Name, router.Hostname).Set(0)
-			routeTotalConnectionsGauge.WithLabelValues(route.Name, router.Hostname).Set(0)
-			routeBlockedHostsGauge.WithLabelValues(route.Name, router.Hostname).Set(0)
-			routeHealthGauge.WithLabelValues(route.Name, router.Hostname).Set(0)
+			routeActiveConnectionsGauge.WithLabelValues(route.Name, lastRouter.Hostname).Set(0)
+			routeTotalConnectionsGauge.WithLabelValues(route.Name, lastRouter.Hostname).Set(0)
+			routeBlockedHostsGauge.WithLabelValues(route.Name, lastRouter.Hostname).Set(0)
+			routeHealthGauge.WithLabelValues(route.Name, lastRouter.Hostname).Set(0)
 
 			for _, routeConnection := range lastRouteConnections {
 				if args.CollectRouteConnectionsByteFromServer {
