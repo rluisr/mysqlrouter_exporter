@@ -295,6 +295,7 @@ func collectRouteMetrics(router *mysqlrouter.Router) {
 			writeError(err)
 			return
 		}
+
 		for _, routeConnection := range routeConnections {
 			if args.CollectRouteConnectionsByteFromServer {
 				routeConnectionsByteFromServerGauge.WithLabelValues(route.Name, router.Hostname, routeConnection.SourceAddress, routeConnection.DestinationAddress).Set(float64(routeConnection.BytesFromServer))

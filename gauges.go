@@ -67,27 +67,33 @@ var (
 		Help:      "",
 	}, []string{"name", "address", "port"})
 	routeConnectionsByteFromServerGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "route_connections_byte_from_server",
-		Help: "Route connections byte from server",
+		Namespace: nameSpace,
+		Name:      "route_connections_byte_from_server",
+		Help:      "Route connections byte from server",
 	}, []string{"name", "router_hostname", "source_address", "destination_address"})
 	routeConnectionsByteToServerGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "route_connections_byte_to_server",
-		Help: "Route connections byte to server",
+		Namespace: nameSpace,
+		Name:      "route_connections_byte_to_server",
+		Help:      "Route connections byte to server",
 	}, []string{"name", "router_hostname", "source_address", "destination_address"})
 	routeConnectionsTimeStartedGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "route_connections_time_started",
-		Help: "Route connections time started",
+		Namespace: nameSpace,
+		Name:      "route_connections_time_started",
+		Help:      "Route connections time started",
 	}, []string{"name", "router_hostname", "source_address", "destination_address"})
 	routeConnectionsTimeConnectedToServerGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "route_connections_time_connected_to_server",
-		Help: "Route connections time connected to server",
+		Namespace: nameSpace,
+		Name:      "route_connections_time_connected_to_server",
+		Help:      "Route connections time connected to server",
 	}, []string{"name", "router_hostname", "source_address", "destination_address"})
 	routeConnectionsTimeLastSentToServerGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "route_connections_time_last_sent_to_server",
-		Help: "Route connections time last sent to server",
+		Namespace: nameSpace,
+		Name:      "route_connections_time_last_sent_to_server",
+		Help:      "Route connections time last sent to server",
 	}, []string{"name", "router_hostname", "source_address", "destination_address"})
 	routeConnectionsTimeLastReceivedFromServerGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "route_connections_time_last_received_from_server",
-		Help: "Route connections time last received from server",
+		Namespace: nameSpace,
+		Name:      "route_connections_time_last_received_from_server",
+		Help:      "Route connections time last received from server",
 	}, []string{"name", "router_hostname", "source_address", "destination_address"})
 )
