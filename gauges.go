@@ -15,7 +15,8 @@ var (
 		Namespace: nameSpace,
 		Name:      "router_status",
 		Help:      "MySQL Router information",
-	}, []string{"process_id", "product_edition", "time_started", "version", "hostname"})
+	}, []string{"process_id", "product_edition", "time_started", "version", "hostname", "service"})
+
 	metadataGauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace: nameSpace,
 		Name:      "metadata",

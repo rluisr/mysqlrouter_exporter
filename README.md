@@ -62,6 +62,7 @@ Application Options:
       --user=                                                Username for REST API [$MYSQLROUTER_EXPORTER_USER]
       --pass=                                                Password for REST API [$MYSQLROUTER_EXPORTER_PASS]
   -p, --listen-port=                                         Listen port (default: 49152)
+      --service-name=                                        Service name for MySQL Router [$MYSQLROUTER_EXPORTER_SERVICE_NAME]
       --tls-ca-cert-path=                                    TLS CA cacert path [$MYSQLROUTER_TLS_CACERT_PATH]
       --tls-cert-path=                                       TLS cert path [$MYSQLROUTER_TLS_CERT_PATH]
       --tls-key-path=                                        TLS key path [$MYSQLROUTER_TLS_KEY_PATH]
