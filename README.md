@@ -108,6 +108,6 @@ scrape_configs:
 
 Grafana Dashboard
 ------------------------
-![Grafana Dashboard](https://grafana.com/api/dashboards/10741/images/6783/image "Grafana Dashboard")
+![Grafana Dashboard](img/grafana.png "Grafana Dashboard")
 
-available [here](https://grafana.com/grafana/dashboards/10741).
+[Download dashboard](https://grafana.com/grafana/dashboards/10741)
