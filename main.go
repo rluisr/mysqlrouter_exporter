@@ -1,14 +1,17 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
 	"strconv"
+	"syscall"
 	"time"
 
 	"github.com/jessevdk/go-flags"
@@ -347,6 +350,31 @@ func main() {
 	addr := fmt.Sprintf("0.0.0.0:%d", args.ListenPort)
 	log.Printf("Start exporter on %s/metrics", addr)
 
-	http.Handle("/metrics", promhttp.Handler())
-	log.Fatal(http.ListenAndServe(addr, nil))
+	server := &http.Server{
+		Addr:    addr,
+		Handler: promhttp.Handler(),
+	}
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+	log.Printf("Server started")
+
+	<-done
+	log.Printf("Server stopped")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer func() {
+		cancel()
+	}()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server Shutdown Failed:%+v", err)
+	}
+	log.Printf("Server Exited Properly")
 }
