@@ -21,9 +21,9 @@ builds:
     goarm:
       - "7"
 archives:
-  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
 release:
   github:
     owner: rluisr
     name: mysqlrouter_exporter
-  prerelease: auto
+  prerelease: false
