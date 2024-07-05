@@ -32,7 +32,7 @@ var args struct {
 	RestAPIURL    string `short:"" long:"url" required:"true" env:"MYSQLROUTER_EXPORTER_URL" description:"MySQL Router Rest API URL"`
 	RestAPIUser   string `short:"" long:"user" required:"false" env:"MYSQLROUTER_EXPORTER_USER" description:"Username for REST API"`
 	RestAPIPass   string `short:"" long:"pass" required:"false" env:"MYSQLROUTER_EXPORTER_PASS" description:"Password for REST API"`
-	ListenPort    int    `short:"p" long:"listen-port" default:"49152" description:"Listen port"`
+	ListenPort    int    `short:"p" long:"listen-port" default:"9152" description:"Listen port"`
 	ServiceName   string `short:"" long:"service-name" required:"true" env:"MYSQLROUTER_EXPORTER_SERVICE_NAME" description:"Service name for MySQL Router"`
 	TLSCACertPath string `short:"" long:"tls-ca-cert-path" required:"false" env:"MYSQLROUTER_TLS_CACERT_PATH" description:"TLS CA cacert path"`
 	TLSCertPath   string `short:"" long:"tls-cert-path" required:"false" env:"MYSQLROUTER_TLS_CERT_PATH" description:"TLS cert path"`
