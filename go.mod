@@ -1,6 +1,6 @@
 module github.com/rluisr/mysqlrouter_exporter
 
-go 1.22
+go 1.22.12
 
 require (
 	github.com/jessevdk/go-flags v1.6.1
